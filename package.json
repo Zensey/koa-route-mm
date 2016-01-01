@@ -15,10 +15,10 @@
   ],
   "devDependencies": {
     "istanbul-harmony": "0",
-    "koa": "0",
+    "koa": "1.1.2",
     "mocha": "^2.2.5",
     "should": "*",
-    "supertest": "0"
+    "supertest": "1.1.0"
   },
   "license": "MIT",
   "dependencies": {
