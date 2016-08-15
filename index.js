@@ -8,6 +8,7 @@
 const pathToRegexp = require('path-to-regexp');
 const debug = require('debug')('koa-route');
 const methods = require('methods');
+const compose = require('koa-compose');
 
 methods.forEach(function(method){
   module.exports[method] = create(method);
