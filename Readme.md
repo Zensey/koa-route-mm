@@ -1,25 +1,15 @@
-# koa-route
+# koa-route-mm
 
- Uber simple route middleware for koa.
+ koa-route-mm is a fork of koa-route, simple route middleware for koa.
+ koa-route-mm allows to stack multiple middleware handlers to one route
+ so you can, for example, wrap some route handlers into database transaction,
+ which can be roll-backed on exception and commited on success.
 
-```js
-var _ = require('koa-route');
-app.use(_.get('/pets', pets.list));
-app.use(_.get('/pets/:name', pets.show));
-```
-
- If you need a full-featured solution check out [koa-router](https://github.com/alexmingoia/koa-router),
- a Koa clone of express-resource.
-
-## Installation
-
-```js
-$ npm install koa-route
-```
-
+ 
 ## Example
 
-  Contrived resource-oriented example:
+  Wrap busyness-method into transaction and handle exceptions.
+  
 
 ```js
 var _ = require('koa-route');
@@ -45,7 +35,19 @@ var pets = {
   }
 };
 
-app.use(_.get('/pets', pets.list));
+
+inject_transaction = function*(next) {
+    try {
+        yield _begin_transaction();
+        yield next;
+        yield _commit_transaction();
+    } catch (exc) {
+        yield _rollback_transaction()
+        throw exc
+    }
+}
+
+app.use(_.get('/pets', inject_transaction, pets.list));
 app.use(_.get('/pets/:name', pets.show));
 
 app.listen(3000);

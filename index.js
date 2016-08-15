@@ -19,21 +19,28 @@ module.exports.all = create();
 function create(method) {
   if (method) method = method.toUpperCase();
 
-  return function(path, fn, opts){
-    const re = pathToRegexp(path, opts);
+  return function(path, middleware){
+    var re = pathToRegexp(path);
+    middleware = Array.prototype.slice.call(arguments, 1);
     debug('%s %s -> %s', method || 'ALL', path, re);
 
     return function *(next){
+      var m;
+
       // method
       if (!matches(this, method)) return yield* next;
 
       // path
-      const m = re.exec(this.path);
-      if (m) {
-        const args = m.slice(1).map(decode);
+      if (m = re.exec(this.path)) {
+        var args = m.slice(1).map(decode);
         debug('%s %s matches %s %j', this.method, path, this.path, args);
         args.push(next);
-        yield* fn.apply(this, args);
+
+        for (var j=0; j< middleware.length; j++) {
+          var fn_ = middleware[j]
+          args[args.length-1] = middleware[j+1] || next
+          yield* fn_.apply(this, args);
+        }
         return;
       }
 
