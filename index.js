@@ -35,12 +35,7 @@ function create(method) {
         var args = m.slice(1).map(decode);
         debug('%s %s matches %s %j', this.method, path, this.path, args);
         args.push(next);
-
-        for (var j=0; j< middleware.length; j++) {
-          var fn_ = middleware[j]
-          args[args.length-1] = middleware[j+1] || next
-          yield* fn_.apply(this, args);
-        }
+        yield* compose(middleware).apply(this, args);
         return;
       }
 
