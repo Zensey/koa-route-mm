@@ -22,7 +22,7 @@ function create(method) {
 
   return function(path, middleware){
     var re = pathToRegexp(path);
-    middleware = Array.prototype.slice.call(arguments, 1);
+    middleware = compose(Array.prototype.slice.call(arguments, 1));
     debug('%s %s -> %s', method || 'ALL', path, re);
 
     return function *(next){
@@ -36,7 +36,7 @@ function create(method) {
         var args = m.slice(1).map(decode);
         debug('%s %s matches %s %j', this.method, path, this.path, args);
         args.push(next);
-        yield* compose(middleware).apply(this, args);
+        yield* middleware.apply(this, args);
         return;
       }
 
